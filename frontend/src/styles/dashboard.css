@@ -1,0 +1,28 @@
+.dashboard-container{
+    padding: 1.5rem;
+    background-color: #f4f6f8;
+    min-height: 100vh;
+}
+
+.dashboard-actions{
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .add-button {
+    padding: 10px 16px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
