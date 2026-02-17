@@ -1,6 +1,6 @@
 import '../styles/ProductTable.css'
 
-function ProductTable({ products, onDelete }) {
+function ProductTable({ products, onDelete , onEdit}) {
 
     return (
         <>
@@ -24,9 +24,9 @@ function ProductTable({ products, onDelete }) {
                                     No products available
                                 </td>
                             </tr>) : (
-                            products.map((products) => (
+                            products.map((products,index) => (
                                 <tr key={products.id}>
-                                    <td>{products?.id}</td>
+                                    <td>{index+1}</td>
                                     <td>{products?.name}</td>
                                     <td>{products?.category}</td>
                                     <td>{products?.price}</td>
@@ -40,7 +40,7 @@ function ProductTable({ products, onDelete }) {
                                         </span>
                                     </td>
                                     <td>
-                                        <button className='table-btn'>Edit</button>
+                                        <button className='table-btn' onClick={() => onEdit(products)}>Edit</button>
                                         <button className='table-btn delete' onClick={() => onDelete(products.id)}>Delete</button>
                                     </td>
                                 </tr>

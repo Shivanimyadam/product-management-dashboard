@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import ProductTable from "../components/ProductTable";
 import '../styles/dashboard.css'
@@ -11,6 +11,9 @@ function Dashboard() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const [selectedProductId, setSelectedProductId] = useState(null);
+
+    const [editingProduct, setEditingProduct] = useState(null);
+
 
 
     const [products, setProducts] = useState([
@@ -38,10 +41,42 @@ function Dashboard() {
     };
 
     const handleConfirmDelete = () => {
-        setProducts(products.filter(p => p.id !== selectedProductId));
+        setProducts((prev) => prev.filter(p => p.id !== selectedProductId));
         setShowDeleteModal(false);
     };
+    // handle add 
+    const handleAdd = () => {
+        setEditingProduct(null);
+        setShowFormModal(true);
 
+    };
+    // handle edit
+    const handleEdit = (product) => {
+        console.log("prodcut sending eidt",product);
+        setEditingProduct(product);
+        setShowFormModal(true);
+    };
+
+    const handleSaveProduct = (product) => {
+        if (editingProduct) {
+            setProducts((prev) =>
+                prev.map(item => item.id === product.id ? product : item)
+            );
+        } else {
+            setProducts((prev) => [...prev, product]);
+        }
+        // setShowFormModal(false);
+    };
+
+    const handleCloseForm = () => {
+        setShowFormModal(false);
+        setEditingProduct(null); // 🔥 VERY IMPORTANT
+      };
+
+      useEffect(() => {
+        console.log("showFormModal:", showFormModal);
+      }, [showFormModal]);
+      
 
     return (
         <>
@@ -54,20 +89,25 @@ function Dashboard() {
                         className="search-input"
                     />
                     <button className="add-button"
-                        onClick={() => setShowFormModal(true)}
+                        onClick={handleAdd}
                     >Add Product</button>
-                    <ProductFormModal
-                        isOpen={showFormModal}
-                        onClose={() => setShowFormModal(false)}
-                    />
-                    <ConfirmDeleteModal
-                        isOpen={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-
-                        onConfirm={handleConfirmDelete}
-                    />
                 </div>
-                <ProductTable products={products} onDelete={handleDelete} />
+                <ProductTable
+                    products={products}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                />
+                <ProductFormModal
+                    isOpen={showFormModal}
+                    onClose={handleCloseForm}
+                    onSubmit={handleSaveProduct}
+                    editingProduct={editingProduct}
+                />
+                <ConfirmDeleteModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={handleConfirmDelete}
+                />
             </div>
         </>
     );

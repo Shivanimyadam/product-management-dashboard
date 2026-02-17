@@ -1,6 +1,6 @@
 import '../styles/modal.css'
 
-function ConfirmDeleteModal({ isOpen, onClose }) {
+function ConfirmDeleteModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
     return (
         <>
@@ -10,7 +10,7 @@ function ConfirmDeleteModal({ isOpen, onClose }) {
                     <p>Are you sure you want to delete this product?</p>
                     <div className="modal-actions">
                         <button className="btn cancel" onClick={onClose}>Cancel</button>
-                        <button className="btn danger">Delete</button>
+                        <button className="btn danger" onClick={onConfirm}>Delete</button>
                     </div>
                 </div>
 
