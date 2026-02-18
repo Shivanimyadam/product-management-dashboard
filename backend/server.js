@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const PORT = 4000;
 
+const db = require('./db');
+
 //Middleware
 
 app.use(cors());
