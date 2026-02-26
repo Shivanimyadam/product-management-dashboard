@@ -4,7 +4,6 @@ import '../styles/modal.css'
 
 function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
   console.log("wditing produvt", editingProduct);
-  if (!isOpen) return null;
 
   const emptyForm = {
     name: "",
@@ -23,6 +22,7 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
     }
   }, [editingProduct, isOpen]);
 
+    if (!isOpen) return null;
 
 
   const handleChange = (e) => {
@@ -32,10 +32,9 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const product = {
-      ...formData,
-      id: editingProduct ? editingProduct.id : crypto.randomUUID(),
-    };
+    const product = editingProduct
+      ? { ...formData, id: editingProduct.id } // editing - keep id
+      : { ...formData }; // adding - no id, let MySQL generate it
 
     onSubmit(product);
     onClose();

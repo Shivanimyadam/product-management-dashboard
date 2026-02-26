@@ -5,6 +5,7 @@ function Header(){
     const navigate = useNavigate();
     const handleLogout = ()=>{
         localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("user");  // ✅ clear user too
         navigate('/login');
     };
 
@@ -13,6 +14,7 @@ function Header(){
     <header>
         <div className="dashboard-header">
             <h2>Product Dashboard</h2>
+            {/* <h4></h4> */}
             <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
     </header>

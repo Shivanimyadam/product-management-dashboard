@@ -16,24 +16,36 @@ function Dashboard() {
 
 
 
-    const [products, setProducts] = useState([
-        {
-            id: 1,
-            name: "iPhone 15",
-            category: "Mobile",
-            price: 80000,
-            stock: 12,
-            status: "In Stock",
-        },
-        {
-            id: 2,
-            name: "MacBook Air",
-            category: "Laptop",
-            price: 120000,
-            stock: 0,
-            status: "Out of Stock",
-        }
-    ]);
+    // const [products, setProducts] = useState(
+    //[
+    //     {
+    //         id: 1,
+    //         name: "iPhone 15",
+    //         category: "Mobile",
+    //         price: 80000,
+    //         stock: 12,
+    //         status: "In Stock",
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "MacBook Air",
+    //         category: "Laptop",
+    //         price: 120000,
+    //         stock: 0,
+    //         status: "Out of Stock",
+    //     }
+    // ]
+    //);
+
+    const [products, setProducts] = useState([]);
+
+    // Fetch all products from API.
+    useEffect(() => {
+        fetch('http://localhost:4000/api/products')
+            .then(res => res.json())
+            .then(data => setProducts(data))
+            .catch(err => console.error("Error fetching products:", err));
+    }, []);
 
     const handleDelete = (id) => {
         setSelectedProductId(id);
@@ -41,8 +53,17 @@ function Dashboard() {
     };
 
     const handleConfirmDelete = () => {
-        setProducts((prev) => prev.filter(p => p.id !== selectedProductId));
-        setShowDeleteModal(false);
+        // using delete api
+        fetch(`http://localhost:4000/api/products/${selectedProductId}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.json())
+            .then(() => {
+                setProducts((prev) => prev.filter(p => p.id !== selectedProductId));
+                setShowDeleteModal(false);
+                        setSelectedProductId(null);
+            })
+            .catch(err => console.error("Error deleting products:", err));
     };
     // handle add 
     const handleAdd = () => {
@@ -52,18 +73,42 @@ function Dashboard() {
     };
     // handle edit
     const handleEdit = (product) => {
-        console.log("prodcut sending eidt",product);
+        console.log("prodcut sending eidt", product);
         setEditingProduct(product);
         setShowFormModal(true);
     };
 
     const handleSaveProduct = (product) => {
+        console.log("product data being saved:", product);
         if (editingProduct) {
-            setProducts((prev) =>
-                prev.map(item => item.id === product.id ? product : item)
-            );
+console.log("IN edit product data being saved:", product);
+            // using edit 'PUT' api
+            fetch(`http://localhost:4000/api/products/${product.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            })
+                .then(res => res.json())
+                .then(() => {
+                    setProducts((prev) =>
+                        prev.map(item => item.id === product.id ? product : item)
+                    );
+                })
+                .catch(err => console.error("Error updating products:", err));
+
         } else {
-            setProducts((prev) => [...prev, product]);
+            console.log("In add product data being saved:", product);
+            // using 'POST'- adding api
+            fetch(`http://localhost:4000/api/products/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            })
+                .then(res => res.json())
+                .then((data) => {
+                    setProducts((prev) => [...prev, { ...product, id: data.id }]);
+                })
+                .catch(err => console.error("Error updating products:", err));
         }
         // setShowFormModal(false);
     };
@@ -71,12 +116,12 @@ function Dashboard() {
     const handleCloseForm = () => {
         setShowFormModal(false);
         setEditingProduct(null); // 🔥 VERY IMPORTANT
-      };
+    };
 
-      useEffect(() => {
+    useEffect(() => {
         console.log("showFormModal:", showFormModal);
-      }, [showFormModal]);
-      
+    }, [showFormModal]);
+
 
     return (
         <>
