@@ -5,9 +5,9 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 
 function App() {
-// const isLoggedIn = localStorage.getItem("isLoggedIn");
+
 const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn"));
-console.log("isLoggedIn value in App.jsx",isLoggedIn);
+
   return (
     <div className='app-container'>
     <Routes>

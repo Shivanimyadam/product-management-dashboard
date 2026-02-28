@@ -3,7 +3,6 @@ import '../styles/modal.css'
 
 
 function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
-  console.log("wditing produvt", editingProduct);
 
   const emptyForm = {
     name: "",
@@ -26,15 +25,35 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
 
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+   const { name, value } = e.target;
+    
+    let updatedForm = { ...formData, [name]: value };
+
+    // If stock is 0 set status to Out of Stock automatically
+    if (name === 'stock' && parseInt(value) === 0) {
+        updatedForm.status = 'Out of Stock';
+    }
+
+    // If stock is more than 0 set status to In Stock automatically
+    if (name === 'stock' && parseInt(value) > 0) {
+        updatedForm.status = 'In Stock';
+    }
+
+    setFormData(updatedForm);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+     const updatedForm = { ...formData };
+
+    // If status is Out of Stock, set stock to 0
+    if (updatedForm.status === 'Out of Stock') {
+        updatedForm.stock = 0;
+    }
 
     const product = editingProduct
-      ? { ...formData, id: editingProduct.id } // editing - keep id
-      : { ...formData }; // adding - no id, let MySQL generate it
+      ? { ...updatedForm, id: editingProduct.id } // editing - keep id
+      : { ...updatedForm }; // adding - no id, let MySQL generate it
 
     onSubmit(product);
     onClose();
@@ -45,26 +64,6 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
       <div className="modal-backdrop" onClick={onClose}>
         <div className="modal-card" onClick={(e) => e.stopPropagation()} >
           <h3>{editingProduct ? "Edit Product" : "Add Product"}</h3>
-          {/* <div className="form-group">
-            <label htmlFor="name">Product Name</label>
-            <input id="name" type="text" placeholder="Enter product name" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <input id="category" type="text" placeholder="Enter category" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="price">Price</label>
-            <input id="price" type="number" placeholder="Enter price" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="stock">Stock</label>
-            <input id="stock" type="number" placeholder="Enter stock" />
-          </div> */}
-
           <form onSubmit={handleSubmit}>
             <label>Product Name</label>
             <input

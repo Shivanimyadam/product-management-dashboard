@@ -4,44 +4,20 @@ import ProductTable from "../components/ProductTable";
 import '../styles/dashboard.css'
 import ProductFormModal from "../components/ProductFormModal";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import toast from "react-hot-toast";
 
 function Dashboard() {
 
     const [showFormModal, setShowFormModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
     const [selectedProductId, setSelectedProductId] = useState(null);
-
     const [editingProduct, setEditingProduct] = useState(null);
-
-
-
-    // const [products, setProducts] = useState(
-    //[
-    //     {
-    //         id: 1,
-    //         name: "iPhone 15",
-    //         category: "Mobile",
-    //         price: 80000,
-    //         stock: 12,
-    //         status: "In Stock",
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "MacBook Air",
-    //         category: "Laptop",
-    //         price: 120000,
-    //         stock: 0,
-    //         status: "Out of Stock",
-    //     }
-    // ]
-    //);
-
     const [products, setProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Fetch all products from API.
     useEffect(() => {
-        fetch('http://localhost:4000/api/products')
+        fetch(`${import.meta.env.VITE_API_URL}/api/products`)
             .then(res => res.json())
             .then(data => setProducts(data))
             .catch(err => console.error("Error fetching products:", err));
@@ -54,16 +30,20 @@ function Dashboard() {
 
     const handleConfirmDelete = () => {
         // using delete api
-        fetch(`http://localhost:4000/api/products/${selectedProductId}`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/products/${selectedProductId}`, {
             method: 'DELETE'
         })
             .then(res => res.json())
             .then(() => {
                 setProducts((prev) => prev.filter(p => p.id !== selectedProductId));
                 setShowDeleteModal(false);
-                        setSelectedProductId(null);
+                setSelectedProductId(null);
+                toast.success("Product deleted successfully!");  // ✅ add this
             })
-            .catch(err => console.error("Error deleting products:", err));
+            .catch(err => {
+                console.error("Error deleting products:", err);
+                toast.error("Failed to delete product!");
+            });
     };
     // handle add 
     const handleAdd = () => {
@@ -73,17 +53,14 @@ function Dashboard() {
     };
     // handle edit
     const handleEdit = (product) => {
-        console.log("prodcut sending eidt", product);
         setEditingProduct(product);
         setShowFormModal(true);
     };
 
     const handleSaveProduct = (product) => {
-        console.log("product data being saved:", product);
         if (editingProduct) {
-console.log("IN edit product data being saved:", product);
             // using edit 'PUT' api
-            fetch(`http://localhost:4000/api/products/${product.id}`, {
+            fetch(`${import.meta.env.VITE_API_URL}/api/products/${product.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)
@@ -93,13 +70,17 @@ console.log("IN edit product data being saved:", product);
                     setProducts((prev) =>
                         prev.map(item => item.id === product.id ? product : item)
                     );
+                    toast.success("Product updated successfully!");  // ✅ add this
                 })
-                .catch(err => console.error("Error updating products:", err));
+                .catch(err => {
+                    console.error("Error updating products:", err);
+                    toast.error("Failed to update product!");
+
+                });
 
         } else {
-            console.log("In add product data being saved:", product);
             // using 'POST'- adding api
-            fetch(`http://localhost:4000/api/products/`, {
+            fetch(`${import.meta.env.VITE_API_URL}/api/products/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)
@@ -107,8 +88,13 @@ console.log("IN edit product data being saved:", product);
                 .then(res => res.json())
                 .then((data) => {
                     setProducts((prev) => [...prev, { ...product, id: data.id }]);
+                    toast.success("Product added successfully!");  // ✅ add this
                 })
-                .catch(err => console.error("Error updating products:", err));
+                .catch(err => {
+                    console.error("Error adding products:", err);
+                    toast.error("Failed to add product!");
+
+                });
         }
         // setShowFormModal(false);
     };
@@ -118,10 +104,9 @@ console.log("IN edit product data being saved:", product);
         setEditingProduct(null); // 🔥 VERY IMPORTANT
     };
 
-    useEffect(() => {
-        console.log("showFormModal:", showFormModal);
-    }, [showFormModal]);
-
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <>
@@ -132,13 +117,15 @@ console.log("IN edit product data being saved:", product);
                         type="text"
                         placeholder="search products..."
                         className="search-input"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     <button className="add-button"
                         onClick={handleAdd}
                     >Add Product</button>
                 </div>
                 <ProductTable
-                    products={products}
+                    products={filteredProducts} //products
                     onDelete={handleDelete}
                     onEdit={handleEdit}
                 />
