@@ -21,22 +21,25 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
     }
   }, [editingProduct, isOpen]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
 
   const handleChange = (e) => {
-   const { name, value } = e.target;
-    
+    const { name, value } = e.target;
+
     let updatedForm = { ...formData, [name]: value };
 
     // If stock is 0 set status to Out of Stock automatically
     if (name === 'stock' && parseInt(value) === 0) {
-        updatedForm.status = 'Out of Stock';
+      updatedForm.status = 'Out of Stock';
     }
 
     // If stock is more than 0 set status to In Stock automatically
     if (name === 'stock' && parseInt(value) > 0) {
-        updatedForm.status = 'In Stock';
+      updatedForm.status = 'In Stock';
+    }
+    if (name === 'status' && value === 'Out of Stock') {
+      updatedForm.stock = 0;
     }
 
     setFormData(updatedForm);
@@ -44,11 +47,11 @@ function ProductFormModal({ isOpen, onClose, onSubmit, editingProduct }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-     const updatedForm = { ...formData };
+    const updatedForm = { ...formData };
 
     // If status is Out of Stock, set stock to 0
     if (updatedForm.status === 'Out of Stock') {
-        updatedForm.stock = 0;
+      updatedForm.stock = 0;
     }
 
     const product = editingProduct
